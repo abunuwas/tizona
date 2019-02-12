@@ -2,6 +2,7 @@ import operator
 from functools import lru_cache, reduce
 
 import click
+from click import ClickException
 
 from tizona.aws.apigateway import ApiGatewayMixin
 from tizona.core import AWSCommand
@@ -10,6 +11,10 @@ from tizona.services.dataclasses import Api
 
 class Service(AWSCommand):
     def __init__(self, project, *args, **kwargs):
+        if not project:
+            raise ClickException(
+                'missing argument: \"project\"',
+            )
         self.project = project
         super(Service, self).__init__(*args, **kwargs)
         self.cloudformation = self.aws_session.client('cloudformation')

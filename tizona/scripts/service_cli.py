@@ -1,4 +1,5 @@
 import click
+from click import ClickException
 from click_help_colors import HelpColorsCommand, HelpColorsGroup
 
 from tizona.decorators import common_options, pass_state
@@ -82,10 +83,12 @@ def get_deployments():
 )
 @click.argument('service')
 @click.option('--project')
+@click.option('--lambda-function')
 @common_options
 @pass_state
-def build(state, service, project):
-    return Build(project=project, service=service, state=state).run()
+def build(state, service, project, lambda_function):
+    return Build(project=project, service=service,
+                 lambda_function=lambda_function, state=state).run()
 
 
 @service.command(
@@ -118,14 +121,20 @@ def rollback():
     help_options_color='green'
 )
 @click.argument('service')
-@click.option('--project', help='Project to which the service belongs', default='')
-@click.option('--lambda-function', help='Lambda function to be updated', default='')
+@click.option('--project', help='Project to which the service belongs')
+@click.option('--lambda-function', help='Lambda function to be updated')
+@click.option('--local', help='Package and deploy the your local code', default=True)  # noqa: E501
+@click.option('--commit', help='Commit to be deployed. A packaged version of '
+                               'the code under this commit must exist in s3')
 @common_options
 @pass_state
-def deploy(state, service, project, lambda_function):
-    print(state.aws_profile, state.aws_region)
-    # build (and upload) [--no-upload]
-    # deploy [--no-build]
+def deploy(state, service, project, lambda_function, local, commit):
+    if not local and not commit:
+        raise ClickException('You must specify either local or commit')
+    if local:
+        commit = Build(project=project, service=service,
+                       lambda_function=lambda_function, state=state).run()
     return Deploy(
-        service=service, project=project, lambda_function=lambda_function, state=state
+        service=service, project=project, lambda_function=lambda_function,
+        commit=commit, state=state
     ).run()
