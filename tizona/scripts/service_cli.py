@@ -2,7 +2,7 @@ import click
 from click_help_colors import HelpColorsCommand, HelpColorsGroup
 
 from tizona.decorators import common_options, pass_state
-from tizona.services.deploy import Deploy
+from tizona.services.deploy import Deploy, Build
 from tizona.services.general import ListFunctions, GetApi, ListApis
 
 
@@ -68,6 +68,10 @@ def get_api(state, service, project):
     help_options_color='green',
     name='get-deployments'
 )
+@click.argument('service')
+@click.option('--project')
+@common_options
+@pass_state
 def get_deployments():
     pass
 
@@ -76,8 +80,12 @@ def get_deployments():
     cls=HelpColorsCommand,
     help_options_color='green',
 )
-def build():
-    pass
+@click.argument('service')
+@click.option('--project')
+@common_options
+@pass_state
+def build(state, service, project):
+    return Build(project=project, service=service, state=state).run()
 
 
 @service.command(
@@ -85,6 +93,10 @@ def build():
     help_options_color='green',
     name='set-function-config'
 )
+@click.argument('service')
+@click.option('--project')
+@common_options
+@pass_state
 def set_function_config():
     pass
 
@@ -93,6 +105,10 @@ def set_function_config():
     cls=HelpColorsCommand,
     help_options_color='green'
 )
+@click.argument('service')
+@click.option('--project')
+@common_options
+@pass_state
 def rollback():
     pass
 
