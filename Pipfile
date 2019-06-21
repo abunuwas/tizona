@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+#sceptre = {editable = true,ref = "10c71e7ab459287a451ccdcfc4876ec97bc5b37d",git = "ssh://git@github.com/cloudreach/sceptre.git"}
+pyyaml = "==4.2b2"
+click-help-colors = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"

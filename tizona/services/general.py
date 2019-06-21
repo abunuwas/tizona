@@ -11,11 +11,6 @@ from tizona.services.dataclasses import Api
 
 class Service(AWSCommand):
     def __init__(self, project, *args, **kwargs):
-        if not project:
-            raise ClickException(
-                'missing argument: \"project\"',
-            )
-        self.project = project
         super(Service, self).__init__(*args, **kwargs)
         self.cloudformation = self.aws_session.client('cloudformation')
         self.aws_lambda = self.aws_session.client('lambda')
@@ -131,6 +126,7 @@ class ListApis(Service, ApiGatewayMixin):
     def run(self):
         api_ids = []
         stacks = self.get_stacks()
+        # import pdb; pdb.set_trace()
         resources = reduce(
             operator.concat,
             [self.list_stack_resources(stack['StackName']) for stack in stacks]

@@ -1,6 +1,7 @@
 import difflib
 import json
 import operator
+import os
 import uuid
 from functools import lru_cache, reduce
 from pathlib import Path
@@ -17,11 +18,6 @@ from tizona.core import AWSCommand
 
 class CloudFormation(AWSCommand):
     def __init__(self, project, *args, **kwargs):
-        if not project:
-            raise ClickException(
-                'missing argument: \"project\"',
-            )
-        self.project = project
         super(CloudFormation, self).__init__(*args, **kwargs)
         self.cloudformation = self.aws_session.client('cloudformation')
         self.aws_lambda = self.aws_session.client('lambda')
@@ -96,6 +92,7 @@ class Sceptre(CloudFormation):
             ignore_dependencies=True
         )
         self.plan = SceptrePlan(context)
+        # import pdb; pdb.set_trace()
 
     @staticmethod
     def resolve_sceptre_project_path():
@@ -117,6 +114,8 @@ class Sceptre(CloudFormation):
         return Path(stack_file_path)
 
     def create_change_set(self, change_set_name):
+        os.environ['AWS_DEFAULT_PROFILE'] = self.aws_profile
+        os.environ['AWS_DEFAULT_REGION'] = self.aws_region
         with click_spinner.spinner():
             self.plan.create_change_set(change_set_name)
             self.plan.wait_for_cs_completion(change_set_name)

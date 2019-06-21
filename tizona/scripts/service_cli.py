@@ -3,7 +3,8 @@ from click import ClickException
 from click_help_colors import HelpColorsCommand, HelpColorsGroup
 
 from tizona.decorators import common_options, pass_state
-from tizona.services.deploy import Deploy, Build
+from tizona.services.build import Build
+from tizona.services.deploy import Deploy
 from tizona.services.general import ListFunctions, GetApi, ListApis
 
 
@@ -123,12 +124,14 @@ def rollback():
 @click.argument('service')
 @click.option('--project', help='Project to which the service belongs')
 @click.option('--lambda-function', help='Lambda function to be updated')
-@click.option('--local', help='Package and deploy the your local code', default=True)  # noqa: E501
+@click.option('--local', help='Package and deploy the your local code',
+              is_flag=True, default=False)  # noqa: E501
 @click.option('--commit', help='Commit to be deployed. A packaged version of '
                                'the code under this commit must exist in s3')
+@click.option('--lambda-handler', help='Path to the execution file')
 @common_options
 @pass_state
-def deploy(state, service, project, lambda_function, local, commit):
+def deploy(state, service, project, lambda_function, local, commit, lambda_handler):  # noqa: E501
     if not local and not commit:
         raise ClickException('You must specify either local or commit')
     if local:
