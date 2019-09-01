@@ -3,7 +3,7 @@ import os
 import click
 
 
-class State(object):
+class State:
 
     def __init__(self):
         self.aws_profile = ''
